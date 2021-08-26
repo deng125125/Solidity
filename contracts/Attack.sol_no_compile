@@ -1,0 +1,51 @@
+pragma solidity 0.8.0;
+
+import "./Setup.sol";
+import "./Lender.sol";
+
+contract Attack is Setup {
+    address owner;
+    address flashloanPoolAddress;
+    Setup public setup;
+    // address flashloanPoolAddress;
+    // address lenderAddress;
+    // WETH9 public constant weth = WETH9(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    // IUniswapV2Factory public constant factory = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
+    // Token public token;
+    // IUniswapV2Pair public pair;
+    // Lender public lender;
+    // FlashLoan public flashloanPool;
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+
+    constructor(address _setup, address _token, address _pair, address _lender, address _flashloanPool) {
+        owner = msg.sender;
+        setup = Setup(_setup);
+        // weth = WETH9(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+        // factory = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
+        token = Token(_token);
+        pair = IUniswapV2Pair(_pair);
+        lender = Lender(_lender);
+        flashloanPoolAddress = _flashloanPool;
+        flashloanPool = FlashLoan(_flashloanPool);
+    }
+
+    function receiveFlashLoan(uint256 amount) external {
+        // to attack
+
+        // money back
+        weth.transfer(flashloanPoolAddress, amount);
+    }
+
+    function toFlashLoan(uint256 amount) public onlyOwner {
+
+        flashloanPool.flashLoan(amount);
+    }
+
+    function balanceOf() public returns (uint) {
+        return weth.balanceOf(address(this));
+    }
+}
